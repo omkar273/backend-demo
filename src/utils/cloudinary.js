@@ -1,17 +1,22 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 
-cloudinary.config({
-    cloud_name: 'caygnus',
-    api_key: '329863484115665',
-    api_secret: process.env.CLOUDINARY_API_KEY,
-});
+
+
 
 const uploadFile = async (filePath) => {
     try {
+        const api_secret = process.env.CLOUDINARY_API_KEY;
+
+        cloudinary.config({
+            cloud_name: 'caygnus',
+            api_key: '329863484115665',
+            api_secret: api_secret,
+        });
+        console.log(api_secret);
+
         if (!fs.existsSync(filePath)) {
             throw new Error('File not found');
-            return;
         }
 
         const uploadResult = await cloudinary.uploader
@@ -21,12 +26,11 @@ const uploadFile = async (filePath) => {
                 // public_id: 'shoes',
             })
         console.log(uploadResult);
-
+        fs.unlinkSync(filePath);
         return uploadResult;
     } catch (error) {
-        console.log(error);
-    } finally {
         fs.unlinkSync(filePath);
+        console.log(error);
     }
 }
 
