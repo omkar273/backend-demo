@@ -55,26 +55,26 @@ userSchema.pre('save', async function (next) {
     next();
 })
 
-userSchema.methods.isPasswordValidate = async function (password) {
+userSchema.methods.isPasswordValid = async function (password) {
     return await bcrypt.compare(password, this.password);
 }
 
 userSchema.methods.generateAcessToken = function () {
-    jwt.sign(
+    return jwt.sign(
         {
             id: this._id,
             email: this.email
         },
-        process.env.JWT_SECRET,
+        process.env.ACESS_TOKEN_SECRET,
         {
-            expiresIn: process.env.JWT_SECRET_EXPIRY
+            expiresIn: process.env.ACESS_TOKEN_EXPIRY
 
         }
     );
 }
 
 userSchema.methods.generateRefreshToken = function () {
-    jwt.sign(
+    return jwt.sign(
         {
             id: this._id,
         },
