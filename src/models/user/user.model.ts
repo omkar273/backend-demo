@@ -3,7 +3,48 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from 'mongoose';
 
-const userSchema = new Schema({
+
+
+export interface IUser extends Document {
+
+    email: string;
+
+    password: string;
+
+    fullname: string;
+
+    role: 'user' | 'admin';
+
+    emailVerified: boolean;
+
+    verifyToken?: string;
+
+    verifyTokenExpiry?: Date;
+
+    createdAt: Date;
+
+    updatedAt: Date;
+
+    avtar?: string;
+
+    refreshToken?: string;
+
+    avatarUrl?: string;
+
+    forgotPasswordToken?: string;
+
+    forgotPasswordTokenExpiry?: Date;
+
+    isPasswordValid(password: string): Promise<boolean>;
+
+    generateAcessToken(): string;
+
+    generateRefreshToken(): string;
+
+}
+
+
+const userSchema = new Schema<IUser>({
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -38,7 +79,13 @@ const userSchema = new Schema({
     verifyToken: {
         type: String,
     },
-    verifyTokenExpires: {
+    verifyTokenExpiry: {
+        type: Date,
+    },
+    forgotPasswordToken: {
+        type: String,
+    },
+    forgotPasswordTokenExpiry: {
         type: Date,
     },
     emailVerified: {
@@ -55,9 +102,10 @@ userSchema.pre('save', async function (next) {
     next();
 })
 
-userSchema.methods.isPasswordValid = async function (password) {
+userSchema.methods.isPasswordValid = async function (password: string) {
     return await bcrypt.compare(password, this.password);
 }
+
 
 userSchema.methods.generateAcessToken = function () {
     return jwt.sign(
